@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Percentage Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* Professional Note Styling */
+        .note {
+            font-size: 22px;
+            font-weight: normal;
+            color: red;
+            border: 2px solid black;
+            padding: 20px;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeIn 3s ease-in-out forwards;
+            letter-spacing: 1px; /* Increase space between characters */
+        }
+
+        /* Fade-in Animation */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* Styling for Note Heading */
+        .note h2 {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: left; /* Align "Note:" to the left */
+        }
+
+        /* Bullet points style */
+        .note ul {
+            text-align: left;
+            display: inline-block;
+            font-size: 18px;
+        }
+
+        .note ul li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 80%;
+            max-width: 600px;
+            margin: 20px auto;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            font-size: 16px;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        td {
+            background-color: #f9f9f9;
+        }
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .button {
+            display: block;
+            width: 200px;
+            margin: 10px auto;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .reset-button {
+            background-color: #f44336;
+        }
+        .reset-button:hover {
+            background-color: #e53935;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Attendance Percentage Calculator</h1>
+
+    <!-- Professional Note with Fade-in animation -->
+    <div class="note">
+        <h2>Note:</h2>
+        <ul>
+            <li>Enter the number of days for each month and press "Enter" to proceed to the next month.</li>
+            <li>Once all data is entered, click "Reset" to clear the form and start over.</li>
+            <li><strong>Only for TERM-1</strong></li>
+        </ul>
+    </div>
+
+    <!-- Reset button on top of the table -->
+    <button class="button reset-button" onclick="resetForm()">Reset</button>
+
+    <table>
+        <tr>
+            <th>Month</th>
+            <th>Enter Days</th>
+            <th>Attendance %</th>
+        </tr>
+        <tr>
+            <td>JUN</td>
+            <td><input type="number" id="jun" onkeydown="moveFocus(event, 'jul')"></td>
+            <td><span id="jun_percent">0%</span></td>
+        </tr>
+        <tr>
+            <td>JUL</td>
+            <td><input type="number" id="jul" onkeydown="moveFocus(event, 'aug')"></td>
+            <td><span id="jul_percent">0%</span></td>
+        </tr>
+        <tr>
+            <td>AUG</td>
+            <td><input type="number" id="aug" onkeydown="moveFocus(event, 'sep')"></td>
+            <td><span id="aug_percent">0%</span></td>
+        </tr>
+        <tr>
+            <td>SEP</td>
+            <td><input type="number" id="sep" onkeydown="moveFocus(event, 'oct')"></td>
+            <td><span id="sep_percent">0%</span></td>
+        </tr>
+        <tr>
+            <td>OCT</td>
+            <td><input type="number" id="oct" onkeydown="moveFocus(event, 'nov')"></td>
+            <td><span id="oct_percent">0%</span></td>
+        </tr>
+        <tr>
+            <td>NOV</td>
+            <td><input type="number" id="nov" onkeydown="moveFocus(event, 'calculate')"></td>
+            <td><span id="nov_percent">0%</span></td>
+        </tr>
+        <tr>
+            <td><strong>TOTAL</strong></td>
+            <td><strong><span id="total_days">0</span></strong></td>
+            <td><strong><span id="total_percent">0%</span></strong></td>
+        </tr>
+    </table>
+
+    <button class="button" id="calculate" onclick="calculateAttendance()">Calculate Attendance%</button>
+
+    <script>
+        // Function to move focus to the next input field when the "Enter" key is pressed
+        function moveFocus(event, nextField) {
+            if (event.key === 'Enter') {
+                // Prevent the default action (which is submitting the form if inside a form)
+                event.preventDefault();
+                // Focus on the next input field
+                document.getElementById(nextField).focus();
+                // If the next field is 'calculate', trigger attendance calculation
+                if (nextField === 'calculate') {
+                    calculateAttendance();
+                }
+            }
+        }
+
+        // Function to calculate attendance percentages
+        function calculateAttendance() {
+            // Get input values for each month
+            let jun = document.getElementById("jun").value;
+            let jul = document.getElementById("jul").value;
+            let aug = document.getElementById("aug").value;
+            let sep = document.getElementById("sep").value;
+            let oct = document.getElementById("oct").value;
+            let nov = document.getElementById("nov").value;
+
+            // Validate input to ensure no empty or invalid entries
+            if (!jun || !jul || !aug || !sep || !oct || !nov) {
+                alert("Please enter a valid number of days for all months.");
+                return;
+            }
+
+            // Define the total days for each month
+            const junTotal = 14;
+            const julTotal = 23;
+            const augTotal = 22;
+            const sepTotal = 20;
+            const octTotal = 16;
+            const novTotal = 24;
+
+            // Calculate attendance percentage for each month
+            let junPercent = (jun / junTotal) * 100;
+            let julPercent = (jul / julTotal) * 100;
+            let augPercent = (aug / augTotal) * 100;
+            let sepPercent = (sep / sepTotal) * 100;
+            let octPercent = (oct / octTotal) * 100;
+            let novPercent = (nov / novTotal) * 100;
+
+            // Update the attendance percentage display for each month
+            document.getElementById("jun_percent").innerText = `${junPercent.toFixed(2)}%`;
+            document.getElementById("jul_percent").innerText = `${julPercent.toFixed(2)}%`;
+            document.getElementById("aug_percent").innerText = `${augPercent.toFixed(2)}%`;
+            document.getElementById("sep_percent").innerText = `${sepPercent.toFixed(2)}%`;
+            document.getElementById("oct_percent").innerText = `${octPercent.toFixed(2)}%`;
+            document.getElementById("nov_percent").innerText = `${novPercent.toFixed(2)}%`;
+
+            // Calculate total attendance percentage
+            let totalDays = parseInt(jun) + parseInt(jul) + parseInt(aug) + parseInt(sep) + parseInt(oct) + parseInt(nov);
+            let totalClasses = junTotal + julTotal + augTotal + sepTotal + octTotal + novTotal;
+            let totalPercent = (totalDays / totalClasses) * 100;
+
+            // Update the total days and total attendance percentage display
+            document.getElementById("total_days").innerText = totalDays;
+            document.getElementById("total_percent").innerText = `${totalPercent.toFixed(2)}%`;
+        }
+
+        // Function to reset all the form fields and attendance data
+        function resetForm() {
+            document.getElementById("jun").value = "";
+            document.getElementById("jul").value = "";
+            document.getElementById("aug").value = "";
+            document.getElementById("sep").value = "";
+            document.getElementById("oct").value = "";
+            document.getElementById("nov").value = "";
+            document.getElementById("jun_percent").innerText = "0%";
+            document.getElementById("jul_percent").innerText = "0%";
+            document.getElementById("aug_percent").innerText = "0%";
+            document.getElementById("sep_percent").innerText = "0%";
+            document.getElementById("oct_percent").innerText = "0%";
+            document.getElementById("nov_percent").innerText = "0%";
+            document.getElementById("total_days").innerText = "0";
+            document.getElementById("total_percent").innerText = "0%";
+        }
+    </script>
+
+</body>
+</html>
